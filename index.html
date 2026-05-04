@@ -51,6 +51,7 @@
   .tag-講師 { background: #ede7f6; color: #4527a0; display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 11px; }
   .tag-達人  { background: #e0f2f1; color: #00695c; display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 11px; }
   .tag-券商  { background: #fff8e1; color: #f57f17; display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 11px; }
+  .tag-kol   { background: #fce4ec; color: #880e4f; display: inline-block; padding: 1px 5px; border-radius: 10px; font-size: 10px; margin-left: 3px; vertical-align: middle; }
 
   .col-name { min-width: 80px; }
   .col-real  { min-width: 90px; color: #777; font-size: 12px; }
@@ -93,12 +94,9 @@
       <th onclick="sortBy('稱呼')">稱呼 <span class="sort-icon">⇅</span></th>
       <th onclick="sortBy('真實姓名')">真實姓名 <span class="sort-icon">⇅</span></th>
       <th onclick="sortBy('狀態')">狀態 <span class="sort-icon">⇅</span></th>
-      <th onclick="sortBy('合作身分')">合作身分 <span class="sort-icon">⇅</span></th>
-      <th onclick="sortBy('XQ 帳號')">XQ 帳號 <span class="sort-icon">⇅</span></th>
+      <th onclick="sortBy('合作身分')">身分 <span class="sort-icon">⇅</span></th>
       <th onclick="sortBy('優惠碼')">優惠碼 <span class="sort-icon">⇅</span></th>
-      <th onclick="sortBy('合作開始日')">合作開始日 <span class="sort-icon">⇅</span></th>
-      <th onclick="sortBy('贊助到期日')">贊助到期日 <span class="sort-icon">⇅</span></th>
-      <th onclick="sortBy('最新有效訂單數')" title="最新有效訂單數">訂單(最新) <span class="sort-icon">⇅</span></th>
+      <th onclick="sortBy('最新有效訂單數')">訂單(當月) <span class="sort-icon">⇅</span></th>
       <th class="num" onclick="sortBy('訂單_上月(3月)')">訂單_上月(3月) <span class="sort-icon">⇅</span></th>
       <th class="num" onclick="sortBy('訂單_當月(4月)')">訂單_當月(4月) <span class="sort-icon">⇅</span></th>
       <th onclick="sortBy('訂單趨勢(月比月)')">訂單趨勢 <span class="sort-icon">⇅</span></th>
@@ -173,7 +171,9 @@ function badgeStatus(s) {
   return `<span class="badge ${map[s]||''}">${s}</span>`;
 }
 function tagType(t) {
+  if (!t) return '';
   if (t.includes('講師')) return `<span class="tag-講師">${t}</span>`;
+  if (t === 'KOL合作')   return `<span class="tag-kol">KOL</span>`;
   if (t.includes('達人')) return `<span class="tag-達人">${t}</span>`;
   if (t.includes('券商')) return `<span class="tag-券商">${t}</span>`;
   return t;
@@ -213,19 +213,15 @@ function render() {
   document.getElementById('total-count').textContent = rows.length;
   const tbody = document.getElementById('tbody');
   if (!rows.length) {
-    tbody.innerHTML = '<tr><td colspan="15" class="no-data">沒有符合的資料</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="11" class="no-data">沒有符合的資料</td></tr>';
     return;
   }
   tbody.innerHTML = rows.map(r => `
     <tr>
-      <td class="col-name"><b>${r['稱呼']||''}</b></td>
-      <td class="col-real">${r['真實姓名']||''}</td>
+      <td class="col-name"><b>${r['稱呼']||''}</b><br><span style="font-size:11px;color:#999;font-weight:normal">${r['真實姓名']||''}</span></td>
       <td>${badgeStatus(r['狀態']||'')}</td>
-      <td>${tagType(r['合作身分']||'')}${r['合作身分2'] ? ' ' + tagType(r['合作身分2']) : ''}</td>
-      <td style="color:#555;font-size:12px">${r['XQ 帳號']||'—'}</td>
+      <td>${tagType(r['合作身分']||'')}${r['合作身分2'] ? tagType(r['合作身分2']) : ''}</td>
       <td style="color:#555;font-size:12px">${r['優惠碼']||'—'}</td>
-      <td>${r['合作開始日']||''}</td>
-      <td style="font-size:12px">${r['贊助到期日']||'—'}</td>
       ${numCell(r['最新有效訂單數'])}
       ${numCell(r['訂單_上月(3月)'])}
       ${numCell(r['訂單_當月(4月)'])}

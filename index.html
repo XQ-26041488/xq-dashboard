@@ -149,11 +149,11 @@ function numVal(v) {
   return isNaN(n) ? -1 : n;
 }
 
-function trendRank(v) {
-  if (v.includes('↑')) return 2;
-  if (v.includes('→')) return 1;
-  if (v.includes('↓')) return 0;
-  return -1;
+function trendValue(v) {
+  const m = v.match(/\(([+-]\d+)\)/);
+  if (m) return parseInt(m[1], 10);
+  if (v.includes('→')) return 0;
+  return null;
 }
 
 function filtered() {
@@ -170,7 +170,10 @@ function filtered() {
     rows.sort((a, b) => {
       let va = a[sortKey] || '', vb = b[sortKey] || '';
       if (sortKey === '訂單趨勢(月比月)') {
-        const ra = trendRank(va), rb = trendRank(vb);
+        const ra = trendValue(va), rb = trendValue(vb);
+        if (ra === null && rb === null) return 0;
+        if (ra === null) return 1;
+        if (rb === null) return -1;
         return sortAsc ? rb - ra : ra - rb;
       }
       const na = numVal(va), nb = numVal(vb);
